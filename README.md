@@ -9,7 +9,7 @@ Recognition for this type of CAPTCHA:
 ![3](https://github.com/skyduy/CNN_keras/raw/master/sample_all/012.jpg)
 
 
-Using 5400 samples, Results obtained are as follows:
+Using 5400 samples, Results obtained in two ways as follows:
 
 ![way_1](https://github.com/skyduy/CNN_keras/raw/master/core_single/tmp/ac1.jpg)
 
@@ -19,5 +19,5 @@ Using 5400 samples, Results obtained are as follows:
 **Email me for detail.**
 
 * Copyright
-  * OpenSource now.
+  * Open source now.
   * Do not for commercial.(If you must do, please contact me.)
