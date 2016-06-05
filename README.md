@@ -9,16 +9,14 @@ Recognition for this type of CAPTCHA:
 ![3](https://github.com/skyduy/CNN_keras/raw/master/sample_all/012.jpg)
 
 
-The result of the training:
+Using 5400 samples, Results obtained are as follows:
 
-Way 1:
 ![way_1](https://github.com/skyduy/CNN_keras/raw/master/core_single/tmp/ac1.jpg)
 
-Way 2:
 ![way_2](https://github.com/skyduy/CNN_keras/raw/master/core_single/tmp/ac2.jpg)
 
 
-For detail. Please email me.
+**Email me for detail.**
 
 * Copyright
   * OpenSource now.
