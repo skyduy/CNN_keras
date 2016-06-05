@@ -11,9 +11,9 @@ Recognition for this type of CAPTCHA:
 
 Using 5400 samples, Results obtained in two ways as follows:
 
-![way_1](https://github.com/skyduy/CNN_keras/raw/master/core_single/tmp/ac1.jpg)
+![way_1](https://github.com/skyduy/CNN_keras/raw/master/core/tmp/ac1.jpg)
 
-![way_2](https://github.com/skyduy/CNN_keras/raw/master/core_single/tmp/ac2.jpg)
+![way_2](https://github.com/skyduy/CNN_keras/raw/master/core/tmp/ac2.jpg)
 
 
 **Email me for detail.**
