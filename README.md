@@ -12,10 +12,10 @@ Recognition for this type of CAPTCHA:
 The result of the training:
 
 Way 1:
-![way_1](https://github.com/skyduy/CNN_keras/raw/master/core_single/tmp/1.jpg)
+![way_1](https://github.com/skyduy/CNN_keras/raw/master/core_single/tmp/ac1.jpg)
 
 Way 2:
-![way_2](https://github.com/skyduy/CNN_keras/raw/master/core_single/tmp/2.jpg)
+![way_2](https://github.com/skyduy/CNN_keras/raw/master/core_single/tmp/ac2.jpg)
 
 
 For detail. Please email me.
