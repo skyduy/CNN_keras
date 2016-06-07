@@ -1,6 +1,6 @@
 # CNN_keras
 
-`Convolutional Neural Network using Keras for CAPTCHA recognition`
+#### [Convolutional Neural Network](https://en.wikipedia.org/wiki/Convolutional_neural_network) using [Keras](https://github.com/fchollet/keras/tree/master/keras) for [CAPTCHA](https://en.wikipedia.org/wiki/CAPTCHA) recognition
 
 Recognition for this type of CAPTCHA:
 
