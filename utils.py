@@ -1,60 +1,38 @@
+import os
 import numpy as np
+
 from PIL import Image
 
-
-def asc_chr(num):
-    num = int(num)
-    if num < 8:
-        answer = chr(num+65)
-    elif num == 8:
-        answer = 'K'
-    elif num == 11:
-        answer = 'P'
-    elif num == 12:
-        answer = 'R'
-    elif num > 12:
-        answer = chr(num+71)
-    else:
-        answer = chr(num+68)
-    return answer
+APPEARED_LETTERS = [
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E',
+    'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'R', 'S', 'T', 'U', 'V', 'W',
+    'X', 'Y', 'Z'
+]
+CAT2CHR = dict(zip(range(len(APPEARED_LETTERS)), APPEARED_LETTERS))
+CHR2CAT = dict(zip(APPEARED_LETTERS, range(len(APPEARED_LETTERS))))
 
 
-def asc_num(char):
-    if char < 'I':
-        answer = ord(char)-65
-    elif char == 'K':
-        answer = 8
-    elif char == 'P':
-        answer = 11
-    elif char == 'R':
-        answer = 12
-    elif char > 'S':
-        answer = ord(char) - 71
-    else:
-        answer = ord(char) - 68
-    return answer
+def distinct_char(folder):
+    chars = set()
+    for fn in os.listdir(folder):
+        if fn.endswith('.jpg'):
+            for letter in fn.split('.')[0]:
+                chars.add(letter)
+    return sorted(list(chars))
 
 
-def load_single_data():
-    kv_dict = {}
-    with open('label.csv') as f:
-        for line in f:
-            line = line.strip().split(',')
-            key = line[0]
-            if key == 'name':
-                continue
-            pre = key.split('.')[0]
-            value = line[1]
-            for i, v in enumerate(value):
-                kv_dict['%s-%d.jpg' % (pre, i)] = v
-    folder = 'sample_single'
-    imgs = kv_dict.keys()
-    length = len(imgs)
-    data = np.empty((length, 3, 40, 40), dtype="float32")
-    label = np.empty(length)
+def load_data(folder):
+    imgs = [i for i in os.listdir(folder) if i.endswith('jpg')]
+    img_nums = len(imgs)
+    data = np.empty((img_nums, 3, 150, 40), dtype="float32")
+    label = np.empty((img_nums, 5))
     for index, img_name in enumerate(imgs):
         img = Image.open('%s/%s' % (folder, img_name))
         arr = np.asarray(img, dtype="float32")/255.0
-        data[index, :, :, :] = np.rollaxis(arr, 2)
-        label[index] = asc_num(kv_dict[img_name])
+        data[index, :, :, :] = np.rollaxis(np.rollaxis(arr, 2), 2, 1)
+        label[index, :] = [CHR2CAT[i] for i in img_name.split('.')[0]]
     return data, label
+
+
+if __name__ == '__main__':
+    print(distinct_char('samples'))
