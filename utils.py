@@ -1,7 +1,6 @@
 import os
+import cv2
 import numpy as np
-
-from PIL import Image
 
 APPEARED_LETTERS = [
     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E',
@@ -22,15 +21,17 @@ def distinct_char(folder):
 
 
 def load_data(folder):
-    imgs = [i for i in os.listdir(folder) if i.endswith('jpg')]
-    img_nums = len(imgs)
-    data = np.empty((img_nums, 3, 150, 40), dtype="float32")
+    img_list = [i for i in os.listdir(folder) if i.endswith('jpg')]
+    img_nums = len(img_list)
+    print('total imgs:', img_nums)
+    data = np.empty((img_nums, 40, 150, 3), dtype="float32")  # channel last
     label = np.empty((img_nums, 5))
-    for index, img_name in enumerate(imgs):
-        img = Image.open('%s/%s' % (folder, img_name))
-        arr = np.asarray(img, dtype="float32")/255.0
-        data[index, :, :, :] = np.rollaxis(np.rollaxis(arr, 2), 2, 1)
-        label[index, :] = [CHR2CAT[i] for i in img_name.split('.')[0]]
+    for index, img_name in enumerate(img_list):
+        img_arr = cv2.imread('{}/{}'.format(folder, img_name)) / 255
+        data[index, :, :, :] = img_arr
+        label[index] = [CHR2CAT[i] for i in img_name.split('.')[0]]
+        if index % 100 == 0:
+            print('{} images loads'.format(index))
     return data, label
 
 

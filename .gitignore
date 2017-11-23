@@ -62,3 +62,7 @@ target/
 .ipynb_checkpoints
 .idea/
 samples/*
+samples_debug/*
+core/models/
+core/tmp/
+core/test.txt
