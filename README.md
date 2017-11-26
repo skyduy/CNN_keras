@@ -4,20 +4,19 @@
 
 Recognition for this type of CAPTCHA:
 
-![1](https://github.com/skyduy/CNN_keras/raw/master/sample_all/001.jpg)
-![2](https://github.com/skyduy/CNN_keras/raw/master/sample_all/006.jpg)
-![3](https://github.com/skyduy/CNN_keras/raw/master/sample_all/012.jpg)
+![1](https://github.com/skyduy/CAPTCHA_generator/blob/master/samples/7L2ND.jpg)
+![2](https://github.com/skyduy/CAPTCHA_generator/blob/master/samples/A4KA4.jpg)
+![3](https://github.com/skyduy/CAPTCHA_generator/blob/master/samples/C4P01.jpg)
+
+This CAPTCHAs generated from repo [CAPTCHA_generator](https://github.com/skyduy/CAPTCHA_generator).
+
+### Achievement
+
+Using about 5000 samples, Obtain 95% single letter accuracy.
 
 
-Using 5400 samples, Results obtained in two ways as follows:
+### Others
 
-![way_1](https://github.com/skyduy/CNN_keras/raw/master/core/tmp/ac1.jpg)
+This repo is for learning purposes only, DO NOT using in commercial.
 
-![way_2](https://github.com/skyduy/CNN_keras/raw/master/core/tmp/ac2.jpg)
-
-
-**Email me for detail.**
-
-* Copyright
-  * Open source now.
-  * Do not for commercial.(If you must do, please contact me.)
+If you have any question, please post a issue or email me.

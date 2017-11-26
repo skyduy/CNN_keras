@@ -7,15 +7,15 @@
     author: Skyduy <cuteuy@gmail.com> <http://skyduy.me>
 
 """
+import os
 import numpy as np
-from numpy import argmax, array
-from sklearn.model_selection import train_test_split
 from keras import layers
+from keras.callbacks import Callback, ModelCheckpoint
 from keras.models import Model
 from keras.utils import to_categorical
-from keras.callbacks import Callback, ModelCheckpoint
+from sklearn.model_selection import train_test_split
 
-from utils import load_data, APPEARED_LETTERS, CAT2CHR
+from core.utils import load_data, APPEARED_LETTERS
 
 
 def prepare_data(folder):
@@ -26,81 +26,64 @@ def prepare_data(folder):
         train_test_split(data, label, test_size=0.1, random_state=0)
     label_categories_train = to_categorical(label_train, letter_num)
     label_categories_test = to_categorical(label_test, letter_num)
-    return ([data_train], [data_test],
-            [label_categories_train[:, i] for i in range(5)],
-            [label_categories_test[:, i] for i in range(5)])
+    return (data_train, label_categories_train,
+            data_test, label_categories_test)
 
 
 def build_model():
     print('... construct network')
-    inputs = layers.Input((40, 150, 3))
-    common_layer = layers.Conv2D(32, 9, activation='relu')(inputs)
-    common_layer = layers.Conv2D(32, 9, activation='relu')(common_layer)
-    common_layer = layers.MaxPool2D((2, 2))(common_layer)
-    common_layer = layers.Flatten()(common_layer)
+    inputs = layers.Input((40, 40, 3))
+    x = layers.Conv2D(32, 9, activation='relu')(inputs)
+    x = layers.Conv2D(32, 9, activation='relu')(x)
+    x = layers.MaxPool2D((2, 2))(x)
+    x = layers.Dropout(0.25)(x)
+    x = layers.Flatten()(x)
+    x = layers.Dense(640)(x)
+    x = layers.Dropout(0.5)(x)
+    out = layers.Dense(len(APPEARED_LETTERS), activation='softmax')(x)
 
-    def _get_specific_layer():
-        x = layers.Dropout(0.2)(common_layer)
-        x = layers.Dense(640)(x)
-        x = layers.Dropout(0.5)(x)
-        out = layers.Dense(len(APPEARED_LETTERS), activation='softmax')(x)
-        return out
-
-    return Model(inputs=[inputs],
-                 outputs=[_get_specific_layer() for _ in range(5)])
+    return Model(inputs=inputs, outputs=out)
 
 
-def get_answer(tmp):
-    num_item = tmp[0].shape[0]
-    num_letter = len(tmp)
-    answer = np.chararray((num_item, num_letter))
-    for column, letter in enumerate(tmp):
-        num, dim = letter.shape
-        answer[:, column] = [
-            CAT2CHR[np.argmax(letter[i])] for i in range(num)
-        ]
-    results = []
-    for line in answer:
-        results.append(b'.'.join(line))
-    return results
-
-
-class TestAcc(Callback):
-    def on_epoch_end(self, epoch, logs=None):
-        print('\n————————————————————————————————————')
-        model.load_weights(
-            'tmp/weights.{epoch:02d}.hdf5'.format(epoch=epoch+1))
-        r = model.predict(x_test, verbose=1)
-        pre = get_answer(r)
-        right = get_answer(y_test)
-        with open('result/{epoch:02d}.txt'.format(epoch=epoch+1), 'w') as f:
-            for i in range(len(pre)):
-                item_pre = pre[i]
-                item_right = right[i]
-                f.write('{}\t{}\n'.format(item_pre, item_right))
-        print('\n————————————————————————————————————')
-
-
-if __name__ == '__main__':
-    x_train, x_test, y_train, y_test = prepare_data(
-        r'D:\Workspace\githome\CNN_keras\samples'
-    )
+def train(pic_folder, weight_folder):
+    if not os.path.exists(weight_folder):
+        os.makedirs(weight_folder)
+    x_train, y_train, x_test, y_test = prepare_data(pic_folder)
     model = build_model()
 
     print('... compile models')
     model.compile(
         optimizer='adadelta',
-        loss=['categorical_crossentropy'] * 5,
-        metrics=['accuracy'] * 5,
-        loss_weights=[1] * 5,
+        loss=['categorical_crossentropy'],
+        metrics=['accuracy'],
     )
 
-    check_point = ModelCheckpoint(
-        filepath="tmp/weights.{epoch:02d}.hdf5"
-    )
-    print(len(x_test))
     print('... begin train')
+
+    check_point = ModelCheckpoint(
+        os.path.join(weight_folder, '{epoch:02d}.hdf5'))
+
+    class TestAcc(Callback):
+        def on_epoch_end(self, epoch, logs=None):
+            weight_file = os.path.join(
+                weight_folder, '{epoch:02d}.hdf5'.format(epoch=epoch + 1))
+            model.load_weights(weight_file)
+            out = model.predict(x_test, verbose=1)
+            predict = np.array([np.argmax(i) for i in out])
+            answer = np.array([np.argmax(i) for i in y_test])
+            acc = np.sum(predict == answer) / len(predict)
+            print('Single letter test accuracy: {:.2%}'.format(acc))
+            print('Picture accuracy: {:.2%}'.format(np.power(acc, 5)))
+            print('----------------------------------\n')
+
     model.fit(
         x_train, y_train, batch_size=128, epochs=100,
         validation_split=0.1, callbacks=[check_point, TestAcc()],
+    )
+
+
+if __name__ == '__main__':
+    train(
+        pic_folder=r'D:\Workspace\githome\CNN_keras\data',
+        weight_folder=r'D:\Workspace\githome\CNN_keras\models'
     )
