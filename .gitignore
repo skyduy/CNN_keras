@@ -61,4 +61,8 @@ target/
 #Ipython Notebook
 .ipynb_checkpoints
 .idea/
-samples/*
+.vscode/
+
+data/
+models/
+samples/
