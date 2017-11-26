@@ -17,6 +17,6 @@ Using about 5000 samples, Obtain 95% single letter accuracy.
 
 ### Others
 
-This repo is for learning purposes only, DO NOT using in commercial.
+This repo is for learning purposes only, DO NOT for commercial using.
 
 If you have any question, please post a issue or email me.
