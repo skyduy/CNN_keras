@@ -1,6 +1,6 @@
 # CNN_keras
 
-__Looking for training using PyTorch? switch to branch [pytorch](https://github.com/skyduy/CAPTCHA_generator)__
+__Looking for training using PyTorch? switch to branch [pytorch](https://github.com/skyduy/CAPTCHA_generator).__
 
 ## Introduction
 [Convolutional Neural Network](https://en.wikipedia.org/wiki/Convolutional_neural_network) using [Keras](https://github.com/fchollet/keras/tree/master/keras) for [CAPTCHA](https://en.wikipedia.org/wiki/CAPTCHA) recognition.
@@ -20,6 +20,4 @@ Using about 5000 samples, Obtain 95% single letter accuracy.
 
 ## Others
 
-This repo is for learning purposes only, DO NOT for commercial using.
-
-If you have any question, please post a issue or email me.
+If you have any question, feel free to post a issue or email me.
