@@ -1,4 +1,4 @@
-# CNN_keras
+# CNN_Keras
 
 __Looking for training using PyTorch? switch to branch [pytorch](https://github.com/skyduy/CNN_keras/tree/pytorch).__
 
