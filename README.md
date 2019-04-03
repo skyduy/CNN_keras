@@ -1,6 +1,8 @@
-# CNN_keras
+# CNN_keras: [Convolutional Neural Network](https://en.wikipedia.org/wiki/Convolutional_neural_network) using [Keras](https://github.com/fchollet/keras/tree/master/keras) for [CAPTCHA](https://en.wikipedia.org/wiki/CAPTCHA) recognition
 
-### [Convolutional Neural Network](https://en.wikipedia.org/wiki/Convolutional_neural_network) using [Keras](https://github.com/fchollet/keras/tree/master/keras) for [CAPTCHA](https://en.wikipedia.org/wiki/CAPTCHA) recognition
+__Looking for train using PyTorch? switch to branch [pytorch](https://github.com/skyduy/CAPTCHA_generator)__
+
+## Introduction
 
 Recognition for this type of CAPTCHA:
 
@@ -8,14 +10,14 @@ Recognition for this type of CAPTCHA:
 ![2](https://github.com/skyduy/CAPTCHA_generator/blob/master/samples/A4KA4.jpg)
 ![3](https://github.com/skyduy/CAPTCHA_generator/blob/master/samples/C4P01.jpg)
 
-This CAPTCHAs generated from repo [CAPTCHA_generator](https://github.com/skyduy/CAPTCHA_generator).
+Actually these CAPTCHAs are generated from repo [CAPTCHA_generator](https://github.com/skyduy/CAPTCHA_generator).
 
-### Achievement
+## Achievement
 
 Using about 5000 samples, Obtain 95% single letter accuracy.
 
 
-### Others
+## Others
 
 This repo is for learning purposes only, DO NOT for commercial using.
 
