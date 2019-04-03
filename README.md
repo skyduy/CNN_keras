@@ -1,6 +1,6 @@
 # CNN_PyTorch
 
-__Looking for training using Keras? switch to branch [master](https://github.com/skyduy/CAPTCHA_generator).__
+__Looking for training using Keras? switch to branch [master](https://github.com/skyduy/CNN_keras/tree/master).__
 
 ## Introduction
 [Convolutional Neural Network](https://en.wikipedia.org/wiki/Convolutional_neural_network) using [PyTorch](https://pytorch.org/) for [CAPTCHA](https://en.wikipedia.org/wiki/CAPTCHA) recognition.
