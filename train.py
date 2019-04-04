@@ -3,45 +3,34 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
+import numpy as np
 from utils import load_data
-
-DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+from datetime import datetime
 
 
 class Net(nn.Module):
-    def __init__(self):
+    def __init__(self, gpu=False):
         super(Net, self).__init__()
-        # size: 3 * 150 * 40
-        self.conv1 = nn.Conv2d(3, 32, 9)  # 32 * 142 * 32
-        self.conv2 = nn.Conv2d(32, 32, 9)  # 32 * 134 * 24
-        self.pool = nn.MaxPool2d(2)  # 32 * 67 * 12
-        self.drop = nn.Dropout2d(0.25)
-        self.fc = nn.Linear(32 * 67 * 12, 640 * 5)
-
-        self.drop1 = nn.Dropout(0.2)
-        self.drop2 = nn.Dropout(0.2)
-        self.drop3 = nn.Dropout(0.2)
-        self.drop4 = nn.Dropout(0.2)
-        self.drop5 = nn.Dropout(0.2)
-        self.fc1 = nn.Linear(640 * 5, 33)
-        self.fc2 = nn.Linear(640 * 5, 33)
-        self.fc3 = nn.Linear(640 * 5, 33)
-        self.fc4 = nn.Linear(640 * 5, 33)
-        self.fc5 = nn.Linear(640 * 5, 33)
+        # size: 3 * 40 * 150
+        self.conv1 = nn.Conv2d(3, 32, 9)  # 32 * 32 * 142
+        self.conv2 = nn.Conv2d(32, 32, 9)  # 32 * 24 * 134
+        self.pool = nn.MaxPool2d(2)  # 32 * 12 * 67
+        self.drop1 = nn.Dropout2d(0.25)
+        # flatten here
+        self.fc1 = nn.Linear(32 * 12 * 67, 640 * 5)
+        self.drop2 = nn.Dropout(0.5)
+        self.fc2 = nn.Linear(640 * 5, 33 * 5)
+        if gpu and torch.cuda.is_available():
+            self.to(torch.device("cuda:0"))
 
     def forward(self, x):
         x = F.relu(self.conv1(x))
-        x = self.pool(F.relu(self.conv2(x)))
-        x = self.drop(x)
-        x = x.view(-1, 32 * 67 * 12)
-        x = self.fc(x)
-
-        x1 = F.relu(self.fc1(self.drop1(x)))
-        x2 = F.relu(self.fc2(self.drop2(x)))
-        x3 = F.relu(self.fc3(self.drop3(x)))
-        x4 = F.relu(self.fc4(self.drop4(x)))
-        x5 = F.relu(self.fc5(self.drop5(x)))
-        return [x1, x2, x3, x4, x5]
+        x = F.relu(self.conv2(x))
+        x = self.drop1(self.pool(x))
+        x = x.view(-1, 32 * 12 * 67)
+        x = self.drop2(self.fc1(x))
+        x = self.fc2(x)
+        return x
 
     def save(self, name, folder='./models'):
         if not os.path.exists(folder):
@@ -55,49 +44,44 @@ class Net(nn.Module):
         self.eval()
 
 
-def validate(net, testloader, epoch):
-    net.load(epoch)
-    correct = 0
-    total = 0
-    with torch.no_grad():
-        for data in testloader:
-            inputs, labels = data['image'], data['labels'].transpose(1, 0)
-            outputs = net(inputs)  # batch
-            for i in range(5):
-                d = outputs[i].data
-                _, res = torch.max(d, 1)
-                ans = labels[i]
-                total += labels.size(0)
-                correct += (res == ans).sum().item()
+def loss_batch(model, loss_func, data, opt=None):
+    xb, yb = data['image'], data['label']
+    loss = loss_func(model(xb), yb)
 
-    print('Accuracy of the network on {0:d} letters: {0:.2f} %%'
-          .format(total, 100 * correct / total))
+    if opt is not None:
+        loss.backward()
+        opt.step()
+        opt.zero_grad()
+
+    return loss.item(), len(xb)
 
 
-def train():
-    trainloader, testloader, classes = load_data(batch_size=4, n=1000)
-    net = Net().to(DEVICE)
-    criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adadelta(net.parameters())
-    for epoch in range(100):
-        running_loss = 0.0
-        for i_batch, data in enumerate(trainloader):
-            inputs, labels = data['image'], data['labels'].transpose(1, 0)
+def fit(epochs, model, loss_func, opt, train_dl, valid_dl):
+    for epoch in range(epochs):
+        model.train()  # train mode
+        for i, data in enumerate(train_dl):
+            loss_batch(model, loss_func, data, opt)
 
-            inputs, labels = inputs.to(DEVICE), labels.to(DEVICE)
-            optimizer.zero_grad()
-            outs = net(inputs)
-            loss = sum(criterion(outs[i], labels[i]) for i in range(5))
-            loss.backward()
-            optimizer.step()
+        model.eval()  # validate mode
+        with torch.no_grad():
+            losses, nums = zip(
+                *[loss_batch(model, loss_func, data) for data in valid_dl]
+            )
+        val_loss = np.sum(np.multiply(losses, nums)) / np.sum(nums)
+        model.save('model-epoch-{}'.format(epoch+1))
+        print('Loss after epoch {}: {:.6f}'.format(epoch+1, val_loss))
 
-            running_loss += loss.item()
-            if i_batch % 100 == 99:
-                print('[%d, %5d] loss: %.3f' %
-                      (epoch + 1, i_batch + 1, running_loss / 10))
-                running_loss = 0.0
-        net.save(epoch)
-        validate(net, testloader, epoch)
 
-    net.save('finish')
-    print('Finished Training')
+def train(use_gpu=True):
+    train_dl, valid_dl = load_data(
+        batch_size=4, max_m=4*9, split_rate=0.2, gpu=use_gpu)
+    model = Net(use_gpu)
+    opt = optim.Adadelta(model.parameters())
+    criterion = nn.MultiLabelSoftMarginLoss()  # loss function
+    fit(100, model, criterion, opt, train_dl, valid_dl)
+    model.save('model-{}'.format(datetime.now().strftime("%Y%m%d%H%M%S")))
+    print('Training finish')
+
+
+if __name__ == '__main__':
+    train()
