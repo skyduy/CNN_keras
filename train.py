@@ -4,7 +4,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 import numpy as np
-from utils import load_data
+from utils import load_data, DEVICE
 from datetime import datetime
 
 
@@ -20,8 +20,8 @@ class Net(nn.Module):
         self.fc1 = nn.Linear(32 * 12 * 67, 640 * 5)
         self.drop2 = nn.Dropout(0.5)
         self.fc2 = nn.Linear(640 * 5, 33 * 5)
-        if gpu and torch.cuda.is_available():
-            self.to(torch.device("cuda:0"))
+        if gpu:
+            self.to(DEVICE)
 
     def forward(self, x):
         x = F.relu(self.conv1(x))
@@ -46,14 +46,18 @@ class Net(nn.Module):
 
 def loss_batch(model, loss_func, data, opt=None):
     xb, yb = data['image'], data['label']
-    loss = loss_func(model(xb), yb)
+    out = model(xb)
+    loss = loss_func(out, yb)
 
     if opt is not None:
         loss.backward()
         opt.step()
         opt.zero_grad()
 
-    return loss.item(), len(xb)
+    loss_item = loss.item()
+    del out
+    del loss
+    return loss_item, len(xb)
 
 
 def fit(epochs, model, loss_func, opt, train_dl, valid_dl):
@@ -68,13 +72,13 @@ def fit(epochs, model, loss_func, opt, train_dl, valid_dl):
                 *[loss_batch(model, loss_func, data) for data in valid_dl]
             )
         val_loss = np.sum(np.multiply(losses, nums)) / np.sum(nums)
-        model.save('model-epoch-{}'.format(epoch+1))
-        print('Loss after epoch {}: {:.6f}'.format(epoch+1, val_loss))
+        model.save('model-epoch-{}'.format(epoch + 1))
+        print('Loss after epoch {}: {:.6f}'.format(epoch + 1, val_loss))
 
 
 def train(use_gpu=True):
     train_dl, valid_dl = load_data(
-        batch_size=4, max_m=4*9, split_rate=0.2, gpu=use_gpu)
+        batch_size=4, max_m=4 * 9, split_rate=0.2, gpu=use_gpu)
     model = Net(use_gpu)
     opt = optim.Adadelta(model.parameters())
     criterion = nn.MultiLabelSoftMarginLoss()  # loss function

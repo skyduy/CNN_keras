@@ -11,6 +11,7 @@ CHARS = ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C',
          'T', 'U', 'V', 'W', 'X', 'Y', 'Z')
 
 ONE_HOT = torch.eye(len(CHARS))
+DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
 class ImageDataset(Dataset):
@@ -62,9 +63,8 @@ class Normalize(transforms.Normalize):
 
 class ToGPU(object):
     def __call__(self, sample):
-        device = torch.device("cuda:0")
-        sample['image'] = sample['image'].to(device)
-        sample['label'] = sample['label'].long().to(device)
+        sample['image'] = sample['image'].to(DEVICE)
+        sample['label'] = sample['label'].float().to(DEVICE)
         return sample
 
 
@@ -85,17 +85,15 @@ def load_data(batch_size=4, max_m=-1, split_rate=0.2, gpu=False):
     chains = [Word2OneHot(),
               ImgToTensor(),
               Normalize([127.5, 127.5, 127.5], [128, 128, 128])]
-    if gpu and torch.cuda.is_available():
+    if gpu:
         chains.append(ToGPU())
     transform = transforms.Compose(chains)
 
     # load data
     train_ds = ImageDataset(folder, train_imgs, transform=transform)
-    train_dl = DataLoader(train_ds, batch_size=batch_size,
-                          shuffle=True, num_workers=2)
+    train_dl = DataLoader(train_ds, batch_size=batch_size, shuffle=True)
     valid_ds = ImageDataset(folder, valid_imgs, transform=transform)
-    valid_dl = DataLoader(valid_ds, batch_size=batch_size,
-                          num_workers=2)
+    valid_dl = DataLoader(valid_ds, batch_size=batch_size)
     return train_dl, valid_dl
 
 
@@ -113,8 +111,8 @@ if __name__ == '__main__':
     trains, tests = load_data()
     dataiter = iter(trains)
     data = next(dataiter)
-    images, cats = data['image'], data['labels']
+    ims, lbs = data['image'], data['label']
 
     # show image and print labels
-    imshow(torchvision.utils.make_grid(images))
-    print(cats)
+    imshow(torchvision.utils.make_grid(ims))
+    print(lbs)
