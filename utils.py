@@ -86,7 +86,7 @@ def load_data(batch_size=4, max_m=-1, split_rate=0.2, gpu=False):
               ImgToTensor(),
               Normalize([127.5, 127.5, 127.5], [128, 128, 128])]
     if gpu and torch.cuda.is_available():
-        chains.append(ToGPU)
+        chains.append(ToGPU())
     transform = transforms.Compose(chains)
 
     # load data
