@@ -1,5 +1,6 @@
 import os
 import torch
+import random
 import numpy as np
 from PIL import Image
 from torch.utils.data import Dataset, DataLoader
@@ -15,10 +16,11 @@ CHAR2CAT = dict(zip(CHARS, range(len(CHARS))))
 
 class ImageDataset(Dataset):
     def __init__(self, img_folder, train=True, transform=None, split_rate=0.2):
-        src, _ = os.path.split(os.path.abspath(__file__))
-        wd = os.path.dirname(src)
+        wd, _ = os.path.split(os.path.abspath(__file__))
         self.folder = os.path.join(wd, img_folder)
         imgs = [i for i in os.listdir(self.folder) if i.endswith('jpg')]
+        random.seed(1)
+        random.shuffle(imgs)
         if not imgs:
             raise Exception('Empty folder!')
 
@@ -54,7 +56,7 @@ class ToTensor(transforms.ToTensor):
         # torch image: C X H X W
         image = np_img.transpose((2, 0, 1))
         return {'image': torch.from_numpy(image).float(),
-                'labels': torch.from_numpy(np_labels)}
+                'labels': torch.from_numpy(np_labels).long()}
 
 
 class Normalize(transforms.Normalize):
@@ -65,19 +67,18 @@ class Normalize(transforms.Normalize):
         return sample
 
 
-def load_data():
+def load_data(batch_size=4):
     transform = transforms.Compose([
         ToTensor(),
         Normalize([127.5, 127.5, 127.5], [128, 128, 128])
     ])
 
-    trainset = ImageDataset('data', transform=transform)
-    trainloader = DataLoader(trainset, batch_size=4, shuffle=True,
-                             num_workers=2)
-
+    trainset = ImageDataset('data', train=True, transform=transform)
+    trainloader = DataLoader(trainset, batch_size=batch_size,
+                             shuffle=True, num_workers=2)
     testset = ImageDataset('data', train=False, transform=transform)
-    testloader = DataLoader(testset, batch_size=4, num_workers=2)
-
+    testloader = DataLoader(testset, batch_size=batch_size,
+                            num_workers=2)
     return trainloader, testloader, CHARS
 
 
