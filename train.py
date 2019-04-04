@@ -72,7 +72,6 @@ def fit(epochs, model, loss_func, opt, train_dl, valid_dl):
                 *[loss_batch(model, loss_func, data) for data in valid_dl]
             )
         val_loss = np.sum(np.multiply(losses, nums)) / np.sum(nums)
-        model.save('model-epoch-{}'.format(epoch + 1))
         print('Loss after epoch {}: {:.6f}'.format(epoch + 1, val_loss))
 
 
