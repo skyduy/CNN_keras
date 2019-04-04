@@ -8,7 +8,20 @@ from utils import load_data, DEVICE
 from datetime import datetime
 
 
-class Net(nn.Module):
+class MyModule(nn.Module):
+    def save(self, name, folder='./models'):
+        if not os.path.exists(folder):
+            os.makedirs(folder)
+        path = os.path.join(folder, name)
+        torch.save(self.state_dict(), path)
+
+    def load(self, name, folder='./models'):
+        path = os.path.join(folder, name)
+        self.load_state_dict(torch.load(path))
+        self.eval()
+
+
+class Net(MyModule):
     def __init__(self, gpu=False):
         super(Net, self).__init__()
         # size: 3 * 40 * 150
@@ -32,16 +45,34 @@ class Net(nn.Module):
         x = self.fc2(x)
         return x
 
-    def save(self, name, folder='./models'):
-        if not os.path.exists(folder):
-            os.makedirs(folder)
-        path = os.path.join(folder, name)
-        torch.save(self.state_dict(), path)
 
-    def load(self, name, folder='./models'):
-        path = os.path.join(folder, name)
-        self.load_state_dict(torch.load(path))
-        self.eval()
+class Net2(MyModule):
+    def __init__(self, gpu=False):
+        super(Net2, self).__init__()
+        # size: 3 * 40 * 150
+        self.conv1 = nn.Conv2d(3, 22, 5)  # 22 * 36 * 146
+        self.pool1 = nn.MaxPool2d(2)  # 22 * 18 * 73
+        self.conv2 = nn.Conv2d(22, 32, 3)  # 32 * 16 * 71
+        self.pool2 = nn.MaxPool2d(2)  # 32 * 8 * 35
+        self.drop1 = nn.Dropout2d(0.25)
+        # flatten here
+        self.fc1 = nn.Linear(32 * 8 * 35, 256)
+        self.drop2 = nn.Dropout(0.5)
+        self.fc2 = nn.Linear(256, 33 * 5)
+        if gpu:
+            self.to(DEVICE)
+
+    def forward(self, x):
+        x = F.relu(self.conv1(x))
+        x = self.pool1(x)
+        x = F.relu(self.conv2(x))
+        x = self.pool2(x)
+        x = self.drop1(x)
+        x = x.view(-1, 32 * 8 * 35)
+        x = F.relu(self.fc1(x))
+        x = self.drop2(x)
+        x = self.fc2(x)
+        return x
 
 
 def loss_batch(model, loss_func, data, opt=None):
@@ -78,7 +109,7 @@ def fit(epochs, model, loss_func, opt, train_dl, valid_dl):
 def train(use_gpu=True):
     train_dl, valid_dl = load_data(
         batch_size=4, max_m=4 * 9, split_rate=0.2, gpu=use_gpu)
-    model = Net(use_gpu)
+    model = Net2(use_gpu)
     opt = optim.Adadelta(model.parameters())
     criterion = nn.MultiLabelSoftMarginLoss()  # loss function
     fit(100, model, criterion, opt, train_dl, valid_dl)
