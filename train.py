@@ -75,7 +75,7 @@ def validate(net, testloader, epoch):
 
 
 def train():
-    trainloader, testloader, classes = load_data(batch_size=4)
+    trainloader, testloader, classes = load_data(batch_size=4, n=1000)
     net = Net().to(DEVICE)
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adadelta(net.parameters())

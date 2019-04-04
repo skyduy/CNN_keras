@@ -15,10 +15,12 @@ CHAR2CAT = dict(zip(CHARS, range(len(CHARS))))
 
 
 class ImageDataset(Dataset):
-    def __init__(self, img_folder, train=True, transform=None, split_rate=0.2):
+    def __init__(self, img_folder, n=-1, train=True,
+                 transform=None, split_rate=0.2):
         wd, _ = os.path.split(os.path.abspath(__file__))
         self.folder = os.path.join(wd, img_folder)
         imgs = [i for i in os.listdir(self.folder) if i.endswith('jpg')]
+        imgs = imgs[:n]
         random.seed(1)
         random.shuffle(imgs)
         if not imgs:
@@ -67,16 +69,16 @@ class Normalize(transforms.Normalize):
         return sample
 
 
-def load_data(batch_size=4):
+def load_data(batch_size=4, n=-1):
     transform = transforms.Compose([
         ToTensor(),
         Normalize([127.5, 127.5, 127.5], [128, 128, 128])
     ])
 
-    trainset = ImageDataset('data', train=True, transform=transform)
+    trainset = ImageDataset('data', n, train=True, transform=transform)
     trainloader = DataLoader(trainset, batch_size=batch_size,
                              shuffle=True, num_workers=2)
-    testset = ImageDataset('data', train=False, transform=transform)
+    testset = ImageDataset('data', n, train=False, transform=transform)
     testloader = DataLoader(testset, batch_size=batch_size,
                             num_workers=2)
     return trainloader, testloader, CHARS
