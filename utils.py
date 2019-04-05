@@ -6,9 +6,8 @@ from PIL import Image
 from torch.utils.data import Dataset, DataLoader
 from torchvision.transforms import transforms, functional
 
-CHARS = ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C',
-         'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'R', 'S',
-         'T', 'U', 'V', 'W', 'X', 'Y', 'Z')
+CHARS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N',
+         'P', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 
 ONE_HOT = torch.eye(len(CHARS))
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -24,7 +23,7 @@ class ImageDataset(Dataset):
         return len(self.im_list)
 
     def __getitem__(self, idx):
-        label = self.im_list[idx][:5]
+        label = self.im_list[idx][:4]
         path = os.path.join(self.folder, self.im_list[idx])
         im = Image.open(path)
         if im.mode != 'RGB':

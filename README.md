@@ -13,12 +13,3 @@ Recognition for this type of CAPTCHA:
 ![3](https://github.com/skyduy/CAPTCHA_generator/blob/master/samples/C4P01.jpg)
 
 Actually these CAPTCHAs are generated from repo [CAPTCHA_generator](https://github.com/skyduy/CAPTCHA_generator).
-
-## Achievement
-
-Using about 5000 samples, Obtain 95% single letter accuracy.
-
-
-## Others
-
-If you have any question, feel free to post a issue or email me.
