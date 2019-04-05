@@ -13,3 +13,8 @@ Recognition for this type of CAPTCHA:
 ![3](https://github.com/skyduy/CNN_keras/blob/pytorch/samples/YUNX_d03a.jpg)
 
 Actually these CAPTCHAs are generated from repo [CAPTCHA_generator](https://github.com/skyduy/CAPTCHA_generator).
+
+
+11分钟，单字母准确率 93%，整体准确率 78%
+
+[achieve](https://github.com/skyduy/CNN_keras/blob/pytorch/achieve.png)

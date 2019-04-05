@@ -140,4 +140,5 @@ def train(use_gpu=True):
 
 
 if __name__ == '__main__':
+    # TODO： 错误字符统计
     train(True)
