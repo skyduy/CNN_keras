@@ -85,7 +85,11 @@ def loss_batch(model, loss_func, data, opt=None):
 
 
 def fit(epochs, model, loss_func, opt, train_dl, valid_dl, verbose=None):
+    max_acc = 0
+    patience_limit = 2
+    patience = 0
     for epoch in range(epochs):
+        patience += 1
         running_loss = 0.0
         model.train()  # train mode
         for i, data in enumerate(train_dl):
@@ -107,11 +111,17 @@ def fit(epochs, model, loss_func, opt, train_dl, valid_dl, verbose=None):
         val_loss = np.sum(np.multiply(losses, batch_size)) / total_size
         single_rate = 100 * np.sum(single) / (total_size * 4)
         whole_rate = 100 * np.sum(whole) / total_size
+        if single_rate > max_acc:
+            patience = 0
+            model.save('model')
+
         print('After epoch {}: \n'
               '\tLoss: {:.6f}\n'
               '\tSingle Acc: {:.2f}%\n'
               '\tWhole Acc: {:.2f}%'
               .format(epoch + 1, val_loss, single_rate, whole_rate))
+        if patience > patience_limit:
+            print('Early stop at epoch {}'.format(epoch+1))
 
 
 def train(use_gpu=True):
@@ -120,9 +130,7 @@ def train(use_gpu=True):
     model = Net(use_gpu)
     opt = optim.Adadelta(model.parameters())
     criterion = nn.BCELoss()  # loss function
-    fit(100, model, criterion, opt, train_dl, valid_dl, 3)
-    model.save('model-{}'.format(datetime.now().strftime("%Y%m%d%H%M%S")))
-    print('Training finish')
+    fit(30, model, criterion, opt, train_dl, valid_dl, 3)
 
 
 if __name__ == '__main__':
