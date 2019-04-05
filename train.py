@@ -4,8 +4,8 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 import numpy as np
-from utils import load_data, DEVICE
-from datetime import datetime
+from utils import load_data, DEVICE, human_time
+from timeit import default_timer as timer
 
 
 class Net(nn.Module):
@@ -25,9 +25,10 @@ class Net(nn.Module):
 
         if gpu:
             self.to(DEVICE)
-
-        if gpu:
-            self.to(DEVICE)
+            if str(DEVICE) == 'cpu':
+                self.device = 'cpu'
+            else:
+                self.device = torch.cuda.get_device_name(0)
 
     def forward(self, x):
         x = F.relu(self.conv1(x))
@@ -113,6 +114,7 @@ def fit(epochs, model, loss_func, opt, train_dl, valid_dl, verbose=None):
         whole_rate = 100 * np.sum(whole) / total_size
         if single_rate > max_acc:
             patience = 0
+            max_acc = single_rate
             model.save('model')
 
         print('After epoch {}: \n'
@@ -122,6 +124,7 @@ def fit(epochs, model, loss_func, opt, train_dl, valid_dl, verbose=None):
               .format(epoch + 1, val_loss, single_rate, whole_rate))
         if patience > patience_limit:
             print('Early stop at epoch {}'.format(epoch+1))
+            break
 
 
 def train(use_gpu=True):
@@ -129,8 +132,12 @@ def train(use_gpu=True):
     model = Net(use_gpu)
     opt = optim.Adadelta(model.parameters())
     criterion = nn.BCELoss()  # loss function
-    fit(30, model, criterion, opt, train_dl, valid_dl, 3)
+    start = timer()
+    fit(30, model, criterion, opt, train_dl, valid_dl, 5)
+    end = timer()
+    t = human_time(start, end)
+    print('Total training time using {}: {}'.format(model.device, t))
 
 
 if __name__ == '__main__':
-    train()
+    train(True)

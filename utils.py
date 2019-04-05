@@ -104,6 +104,19 @@ def imshow(img):
     im.show()
 
 
+def human_time(start, end):
+    s = int(end-start)
+    if s < 60:
+        return '{}s'.format(s)
+    m = s / 60
+    s = s % 60
+    if m < 59:
+        return '{}m {}s'.format(m, s)
+    h = m / 60
+    m = m % 60
+    return '{}h {}m {}s'.format(h, m, s)
+
+
 if __name__ == '__main__':
     import torchvision
 
