@@ -8,7 +8,35 @@ from utils import load_data, DEVICE
 from datetime import datetime
 
 
-class MyModule(nn.Module):
+class Net(nn.Module):
+    def __init__(self, gpu=False):
+        super(Net, self).__init__()
+        # size: 3 * 36 * 120
+        self.conv1 = nn.Conv2d(3, 6, 5)  # 6 * 32 * 116
+        self.pool1 = nn.MaxPool2d(2)  # 6 * 16 * 58
+        self.conv2 = nn.Conv2d(6, 16, 5)  # 16 * 12 * 54
+        self.pool2 = nn.MaxPool2d(2)  # 16 * 6 * 27
+        # flatten here
+        self.fc1 = nn.Linear(16 * 6 * 27, 480)
+        self.fc2 = nn.Linear(480, 23 * 4)
+
+        if gpu:
+            self.to(DEVICE)
+
+    def forward(self, x):
+        x = F.relu(self.conv1(x))
+        x = self.pool1(x)
+        x = F.relu(self.conv2(x))
+        x = self.pool2(x)
+        x = x.view(-1, 16 * 6 * 27)  # flatten here
+        x = F.relu(self.fc1(x))
+        x = self.fc2(x)
+        outs = list()
+        for i in range(4):
+            outs.append(F.softmax(x[i*23: (i+1)*23], 1))
+        x = torch.cat(outs)
+        return x
+
     def save(self, name, folder='./models'):
         if not os.path.exists(folder):
             os.makedirs(folder)
@@ -19,36 +47,6 @@ class MyModule(nn.Module):
         path = os.path.join(folder, name)
         self.load_state_dict(torch.load(path))
         self.eval()
-
-
-class Net(MyModule):
-    def __init__(self, gpu=False):
-        super(Net, self).__init__()
-        # size: 3 * 36 * 120
-        self.conv1 = nn.Conv2d(3, 22, 5)  # 22 * 32 * 116
-        self.pool1 = nn.MaxPool2d(2)  # 22 * 16 * 58
-        self.conv2 = nn.Conv2d(22, 44, 3)  # 44 * 14 * 56
-        self.pool2 = nn.MaxPool2d(2)  # 44 * 7 * 28
-        self.drop1 = nn.Dropout(0.25)
-        # flatten here
-        self.fc1 = nn.Linear(44 * 7 * 28, 256)
-        self.drop2 = nn.Dropout(0.5)
-        self.fc2 = nn.Linear(256, 23 * 4)
-
-        if gpu:
-            self.to(DEVICE)
-
-    def forward(self, x):
-        x = F.relu(self.conv1(x))
-        x = self.pool1(x)
-        x = F.relu(self.conv2(x))
-        x = self.pool2(x)
-        x = self.drop1(x)
-        x = x.view(-1, 44 * 7 * 28)  # flatten here
-        x = F.relu(self.fc1(x))
-        x = self.drop2(x)
-        x = F.softmax(self.fc2(x), 1)
-        return x
 
 
 def loss_batch(model, loss_func, data, opt=None):
