@@ -58,33 +58,60 @@ class Net(nn.Module):
 
 def loss_batch(model, loss_func, data, opt=None):
     xb, yb = data['image'], data['label']
+    batch_size = len(xb)
     out = model(xb)
     loss = loss_func(out, yb)
 
+    single_correct, whole_correct = 0, 0
     if opt is not None:
         opt.zero_grad()
         loss.backward()
         opt.step()
-
+    else:  # calc accuracy
+        yb = yb.view(-1, 4, 23)
+        out_matrix = out.view(-1, 4, 23)
+        _, ans = torch.max(yb, 2)
+        _, predicted = torch.max(out_matrix, 2)
+        compare = (predicted == ans)
+        single_correct = compare.sum().item()
+        for i in range(batch_size):
+            if compare[i].sum().item() == 4:
+                whole_correct += 1
+        del out_matrix
     loss_item = loss.item()
     del out
     del loss
-    return loss_item, len(xb)
+    return loss_item, single_correct, whole_correct, batch_size
 
 
-def fit(epochs, model, loss_func, opt, train_dl, valid_dl):
+def fit(epochs, model, loss_func, opt, train_dl, valid_dl, verbose=None):
     for epoch in range(epochs):
+        running_loss = 0.0
         model.train()  # train mode
         for i, data in enumerate(train_dl):
-            loss_batch(model, loss_func, data, opt)
+            loss, _, _, s = loss_batch(model, loss_func, data, opt)
+            if isinstance(verbose, int):
+                running_loss += loss * s
+                if i % verbose == verbose - 1:
+                    ave_loss = running_loss / (s * verbose)
+                    print('[Epoch {}][Batch {}] got loss: {:.3f}'
+                          .format(epoch + 1, i + 1, ave_loss))
+                    running_loss = 0.0
 
         model.eval()  # validate mode
         with torch.no_grad():
-            losses, nums = zip(
+            losses, single, whole, batch_size = zip(
                 *[loss_batch(model, loss_func, data) for data in valid_dl]
             )
-        val_loss = np.sum(np.multiply(losses, nums)) / np.sum(nums)
-        print('Loss after epoch {}: {:.6f}'.format(epoch + 1, val_loss))
+        total_size = np.sum(batch_size)
+        val_loss = np.sum(np.multiply(losses, batch_size)) / total_size
+        single_rate = 100 * np.sum(single) / (total_size * 4)
+        whole_rate = 100 * np.sum(whole) / total_size
+        print('After epoch {}: \n'
+              '\tLoss: {:.6f}\n'
+              '\tSingle Acc: {:.2f}%\n'
+              '\tWhole Acc: {:.2f}%'
+              .format(epoch + 1, val_loss, single_rate, whole_rate))
 
 
 def train(use_gpu=True):
@@ -93,7 +120,7 @@ def train(use_gpu=True):
     model = Net(use_gpu)
     opt = optim.Adadelta(model.parameters())
     criterion = nn.BCELoss()  # loss function
-    fit(100, model, criterion, opt, train_dl, valid_dl)
+    fit(100, model, criterion, opt, train_dl, valid_dl, 3)
     model.save('model-{}'.format(datetime.now().strftime("%Y%m%d%H%M%S")))
     print('Training finish')
 
