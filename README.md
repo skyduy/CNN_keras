@@ -7,9 +7,9 @@ __Looking for training using PyTorch? switch to branch [pytorch](https://github.
 
 Recognition for this type of CAPTCHA:
 
-![1](https://github.com/skyduy/CAPTCHA_generator/blob/master/samples/5WNAU.jpg)
-![2](https://github.com/skyduy/CAPTCHA_generator/blob/master/samples/HCMYT.jpg)
-![3](https://github.com/skyduy/CAPTCHA_generator/blob/master/samples/YRY8S.jpg)
+![1](https://github.com/skyduy/CNN_keras/blob/master/samples/5WNAU.jpg)
+![2](https://github.com/skyduy/CNN_keras/blob/master/samples/HCMYT.jpg)
+![3](https://github.com/skyduy/CNN_keras/blob/master/samples/YRY8S.jpg)
 
 Actually these CAPTCHAs are generated from repo [CAPTCHA_generator](https://github.com/skyduy/CAPTCHA_generator).
 
