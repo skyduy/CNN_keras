@@ -125,8 +125,7 @@ def fit(epochs, model, loss_func, opt, train_dl, valid_dl, verbose=None):
 
 
 def train(use_gpu=True):
-    train_dl, valid_dl = load_data(
-        batch_size=4, max_m=4 * 9, split_rate=0.2, gpu=use_gpu)
+    train_dl, valid_dl = load_data(batch_size=4, split_rate=0.2, gpu=use_gpu)
     model = Net(use_gpu)
     opt = optim.Adadelta(model.parameters())
     criterion = nn.BCELoss()  # loss function
