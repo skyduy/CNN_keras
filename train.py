@@ -30,11 +30,9 @@ class Net(nn.Module):
         x = self.pool2(x)
         x = x.view(-1, 16 * 6 * 27)  # flatten here
         x = F.relu(self.fc1(x))
-        x = self.fc2(x)
-        outs = list()
-        for i in range(4):
-            outs.append(F.softmax(x[i*23: (i+1)*23], 1))
-        x = torch.cat(outs)
+        x = self.fc2(x).view(-1, 4, 23)
+        x = F.softmax(x, dim=2)
+        x = x.view(-1, 4 * 23)
         return x
 
     def save(self, name, folder='./models'):
