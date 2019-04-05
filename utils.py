@@ -6,8 +6,8 @@ from PIL import Image
 from torch.utils.data import Dataset, DataLoader
 from torchvision.transforms import transforms, functional
 
-CHARS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N',
-         'P', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+CHARS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'K', 'M',
+         'N', 'P', 'R', 'T', 'U', 'V', 'W', 'X', 'Y']
 
 ONE_HOT = torch.eye(len(CHARS))
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")

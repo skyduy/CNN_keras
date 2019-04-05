@@ -21,7 +21,7 @@ class Net(nn.Module):
         self.drop2 = nn.Dropout(0.25)
         self.fc1 = nn.Linear(48 * 6 * 27, 1440)
         self.drop3 = nn.Dropout(0.25)
-        self.fc2 = nn.Linear(1440, 23 * 4)
+        self.fc2 = nn.Linear(1440, 19 * 4)
 
         if gpu:
             self.to(DEVICE)
@@ -39,9 +39,9 @@ class Net(nn.Module):
         x = self.drop2(x)
         x = F.relu(self.fc1(x))
         x = self.drop3(x)
-        x = self.fc2(x).view(-1, 4, 23)
+        x = self.fc2(x).view(-1, 4, 19)
         x = F.softmax(x, dim=2)
-        x = x.view(-1, 4 * 23)
+        x = x.view(-1, 4 * 19)
         return x
 
     def save(self, name, folder='./models'):
@@ -68,8 +68,8 @@ def loss_batch(model, loss_func, data, opt=None):
         loss.backward()
         opt.step()
     else:  # calc accuracy
-        yb = yb.view(-1, 4, 23)
-        out_matrix = out.view(-1, 4, 23)
+        yb = yb.view(-1, 4, 19)
+        out_matrix = out.view(-1, 4, 19)
         _, ans = torch.max(yb, 2)
         _, predicted = torch.max(out_matrix, 2)
         compare = (predicted == ans)
