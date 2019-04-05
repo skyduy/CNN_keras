@@ -1,15 +1,15 @@
 # CNN_Keras
 
-__Looking for training using PyTorch? switch to branch [pytorch](https://github.com/skyduy/CNN_keras/tree/pytorch).__
+__Looking for training using PyTorch? switch to branch [pytorch](https://github.com/skyduy/CNN_keras/tree/pytorch). It uses more clever method.__
 
 ## Introduction
 [Convolutional Neural Network](https://en.wikipedia.org/wiki/Convolutional_neural_network) using [Keras](https://github.com/fchollet/keras/tree/master/keras) for [CAPTCHA](https://en.wikipedia.org/wiki/CAPTCHA) recognition.
 
 Recognition for this type of CAPTCHA:
 
-![1](https://github.com/skyduy/CAPTCHA_generator/blob/master/samples/7L2ND.jpg)
-![2](https://github.com/skyduy/CAPTCHA_generator/blob/master/samples/A4KA4.jpg)
-![3](https://github.com/skyduy/CAPTCHA_generator/blob/master/samples/C4P01.jpg)
+![1](https://github.com/skyduy/CAPTCHA_generator/blob/master/samples/5WNAU.jpg)
+![2](https://github.com/skyduy/CAPTCHA_generator/blob/master/samples/HCMYT.jpg)
+![3](https://github.com/skyduy/CAPTCHA_generator/blob/master/samples/YRY8S.jpg)
 
 Actually these CAPTCHAs are generated from repo [CAPTCHA_generator](https://github.com/skyduy/CAPTCHA_generator).
 
