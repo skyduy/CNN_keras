@@ -8,8 +8,8 @@ __Looking for training using Keras? switch to branch [master](https://github.com
 
 Recognition for this type of CAPTCHA:
 
-![1](https://github.com/skyduy/CAPTCHA_generator/blob/master/samples/7L2ND.jpg)
-![2](https://github.com/skyduy/CAPTCHA_generator/blob/master/samples/A4KA4.jpg)
-![3](https://github.com/skyduy/CAPTCHA_generator/blob/master/samples/C4P01.jpg)
+![1](https://github.com/skyduy/CNN_keras/tree/pytorch/samples/BJNF_ccac.jpg)
+![2](https://github.com/skyduy/CNN_keras/tree/pytorch/samples/EGVL_2a78.jpg)
+![3](https://github.com/skyduy/CNN_keras/tree/pytorch/samples/SBST_500c.jpg)
 
 Actually these CAPTCHAs are generated from repo [CAPTCHA_generator](https://github.com/skyduy/CAPTCHA_generator).

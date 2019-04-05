@@ -25,13 +25,15 @@ class Net(MyModule):
     def __init__(self, gpu=False):
         super(Net, self).__init__()
         # size: 3 * 36 * 120
-        self.conv1 = nn.Conv2d(3, 32, (5, 9))  # 32 * 32 * 112
-        self.pool1 = nn.MaxPool2d((2, 4))  # 32 * 16 * 28
-        self.conv2 = nn.Conv2d(32, 16, (5, 7))  # 16 * 12 * 22
-        self.pool2 = nn.MaxPool2d((2, 3))  # 16 * 6 * 7
+        self.conv1 = nn.Conv2d(3, 22, 5)  # 22 * 32 * 116
+        self.pool1 = nn.MaxPool2d(2)  # 22 * 16 * 58
+        self.conv2 = nn.Conv2d(22, 44, 3)  # 44 * 14 * 56
+        self.pool2 = nn.MaxPool2d(2)  # 44 * 7 * 28
+        self.drop1 = nn.Dropout(0.25)
         # flatten here
-        self.fc = nn.Linear(16 * 6 * 7, 23 * 4)
-        self.sm = nn.Softmax(1)
+        self.fc1 = nn.Linear(44 * 7 * 28, 256)
+        self.drop2 = nn.Dropout(0.5)
+        self.fc2 = nn.Linear(256, 23 * 4)
 
         if gpu:
             self.to(DEVICE)
@@ -41,8 +43,11 @@ class Net(MyModule):
         x = self.pool1(x)
         x = F.relu(self.conv2(x))
         x = self.pool2(x)
-        x = x.view(-1, 16 * 6 * 7)
-        x = self.sm(self.fc(x))
+        x = self.drop1(x)
+        x = x.view(-1, 44 * 7 * 28)  # flatten here
+        x = F.relu(self.fc1(x))
+        x = self.drop2(x)
+        x = F.softmax(self.fc2(x), 1)
         return x
 
 
