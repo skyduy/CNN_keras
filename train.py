@@ -94,7 +94,7 @@ def fit(epochs, model, loss_func, opt, train_dl, valid_dl, verbose=None):
                 running_loss += loss * s
                 if i % verbose == verbose - 1:
                     ave_loss = running_loss / (s * verbose)
-                    print('[Epoch {}][Batch {}] got loss: {:.3f}'
+                    print('[Epoch {}][Batch {}] got training loss: {:.6f}'
                           .format(epoch + 1, i + 1, ave_loss))
                     running_loss = 0.0
 
