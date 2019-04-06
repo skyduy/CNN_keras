@@ -18,9 +18,9 @@ class Net(nn.Module):
         self.pool2 = nn.MaxPool2d(2)  # 48 * 6 * 27
         # flatten here
         self.drop1 = nn.Dropout(0.5)
-        self.fc1 = nn.Linear(48 * 6 * 27, 640)
+        self.fc1 = nn.Linear(48 * 6 * 27, 360)
         self.drop2 = nn.Dropout(0.25)
-        self.fc2 = nn.Linear(640, 19 * 4)
+        self.fc2 = nn.Linear(360, 19 * 4)
 
         if gpu:
             self.to(DEVICE)
@@ -134,7 +134,7 @@ def train(use_gpu=True):
     opt = optim.Adadelta(model.parameters())
     criterion = nn.BCELoss()  # loss function
     start = timer()
-    fit(30, model, criterion, opt, train_dl, valid_dl, 5)
+    fit(30, model, criterion, opt, train_dl, valid_dl, 500)
     end = timer()
     t = human_time(start, end)
     print('Total training time using {}: {}'.format(model.device, t))
