@@ -12,16 +12,15 @@ class Net(nn.Module):
     def __init__(self, gpu=False):
         super(Net, self).__init__()
         # size: 3 * 36 * 120
-        self.conv1 = nn.Conv2d(3, 18, 5)  # 18 * 32 * 116
-        self.pool1 = nn.MaxPool2d(2)  # 18 * 16 * 58
-        self.drop1 = nn.Dropout(0.25)
-        self.conv2 = nn.Conv2d(18, 48, 5)  # 48 * 12 * 54
-        self.pool2 = nn.MaxPool2d(2)  # 48 * 6 * 27
+        self.conv1 = nn.Conv2d(3, 6, 5)  # 6 * 32 * 116
+        self.pool1 = nn.MaxPool2d(2)  # 6 * 16 * 58
+        self.conv2 = nn.Conv2d(6, 16, 5)  # 16 * 12 * 54
+        self.pool2 = nn.MaxPool2d(2)  # 16 * 6 * 27
         # flatten here
-        self.drop2 = nn.Dropout(0.25)
-        self.fc1 = nn.Linear(48 * 6 * 27, 1440)
-        self.drop3 = nn.Dropout(0.25)
-        self.fc2 = nn.Linear(1440, 19 * 4)
+        self.drop1 = nn.Dropout(0.25)
+        self.fc1 = nn.Linear(16 * 6 * 27, 540)
+        self.drop2 = nn.Dropout(0.5)
+        self.fc2 = nn.Linear(540, 19 * 4)
 
         if gpu:
             self.to(DEVICE)
@@ -33,13 +32,12 @@ class Net(nn.Module):
     def forward(self, x):
         x = F.relu(self.conv1(x))
         x = self.pool1(x)
-        x = self.drop1(x)
         x = F.relu(self.conv2(x))
         x = self.pool2(x)
-        x = x.view(-1, 48 * 6 * 27)  # flatten here
-        x = self.drop2(x)
+        x = x.view(-1, 16 * 6 * 27)  # flatten here
+        x = self.drop1(x)
         x = F.relu(self.fc1(x))
-        x = self.drop3(x)
+        x = self.drop2(x)
         x = self.fc2(x).view(-1, 4, 19)
         x = F.softmax(x, dim=2)
         x = x.view(-1, 4 * 19)
@@ -92,15 +90,18 @@ def fit(epochs, model, loss_func, opt, train_dl, valid_dl, verbose=None):
     for epoch in range(epochs):
         patience += 1
         running_loss = 0.0
+        total_nums = 0
         model.train()  # train mode
         for i, data in enumerate(train_dl):
             loss, _, _, s = loss_batch(model, loss_func, data, opt)
             if isinstance(verbose, int):
                 running_loss += loss * s
+                total_nums += s
                 if i % verbose == verbose - 1:
-                    ave_loss = running_loss / (s * verbose)
+                    ave_loss = running_loss / total_nums
                     print('[Epoch {}][Batch {}] got training loss: {:.6f}'
                           .format(epoch + 1, i + 1, ave_loss))
+                    total_nums = 0
                     running_loss = 0.0
 
         model.eval()  # validate mode
