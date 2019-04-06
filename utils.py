@@ -67,7 +67,7 @@ class ToGPU(object):
         return sample
 
 
-def load_data(batch_size=4, max_m=-1, split_rate=0.2, gpu=False):
+def load_data(batch_size=4, max_m=-1, split_rate=0.2, gpu=True):
     # list images
     wd, _ = os.path.split(os.path.abspath(__file__))
     folder = os.path.join(wd, 'data')

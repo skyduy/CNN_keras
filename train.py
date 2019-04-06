@@ -4,6 +4,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 import numpy as np
+from torchviz import make_dot
 from utils import load_data, DEVICE, human_time
 from timeit import default_timer as timer
 
@@ -17,9 +18,8 @@ class Net(nn.Module):
         self.conv2 = nn.Conv2d(18, 48, 5)  # 48 * 12 * 54
         self.pool2 = nn.MaxPool2d(2)  # 48 * 6 * 27
         # flatten here
-        self.drop1 = nn.Dropout(0.5)
+        self.drop = nn.Dropout(0.5)
         self.fc1 = nn.Linear(48 * 6 * 27, 360)
-        self.drop2 = nn.Dropout(0.25)
         self.fc2 = nn.Linear(360, 19 * 4)
 
         if gpu:
@@ -35,9 +35,8 @@ class Net(nn.Module):
         x = F.relu(self.conv2(x))
         x = self.pool2(x)
         x = x.view(-1, 48 * 6 * 27)  # flatten here
-        x = self.drop1(x)
+        x = self.drop(x)
         x = F.relu(self.fc1(x))
-        x = self.drop2(x)
         x = self.fc2(x).view(-1, 4, 19)
         x = F.softmax(x, dim=2)
         x = x.view(-1, 4 * 19)
@@ -50,9 +49,28 @@ class Net(nn.Module):
         torch.save(self.state_dict(), path)
 
     def load(self, name, folder='./models'):
+        # model (gpu, cpu); net (gpu, cpu)
         path = os.path.join(folder, name)
-        self.load_state_dict(torch.load(path))
+        if self.device == 'cpu':
+            try:  # load cpu model directly
+                static_dict = torch.load(path)
+            except KeyError:  # load gpu model on cpu device
+                static_dict = torch.load(
+                    path, map_location=lambda storage, loc: storage)
+        else:
+            try:
+                static_dict = torch.load(path)
+            except Exception as e:  # load gpu model on cpu device
+                print('You are using GPU model, try CPU model')
+                raise e
+
+        self.load_state_dict(static_dict)
         self.eval()
+
+    def graph(self):
+        x = torch.rand(1, 3, 36, 120)
+        y = self(x)
+        return make_dot(y, params=dict(self.named_parameters()))
 
 
 def loss_batch(model, loss_func, data, opt=None):
@@ -104,7 +122,7 @@ def fit(epochs, model, loss_func, opt, train_dl, valid_dl, verbose=None):
                     total_nums = 0
                     running_loss = 0.0
 
-        model.eval()  # validate mode
+        model.eval()  # validate mode, working for drop out layer.
         with torch.no_grad():
             losses, single, whole, batch_size = zip(
                 *[loss_batch(model, loss_func, data) for data in valid_dl]
