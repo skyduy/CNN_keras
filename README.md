@@ -25,9 +25,9 @@ See model graph below for detail info.
 
 ## Achievement
 
-Using 5k training set:
+Using 4.8k training set:
 
-![5k](https://github.com/skyduy/CNN_keras/blob/pytorch/achievements/5k.png)
+![4.8k](https://github.com/skyduy/CNN_keras/blob/pytorch/achievements/4.8k.png)
 
 Using 10k training set:
 

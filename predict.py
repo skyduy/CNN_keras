@@ -27,14 +27,14 @@ class Predictor(object):
         with torch.no_grad():
             xb = im.unsqueeze(0)
             out = self.net(xb).squeeze(0).view(4, 19)
-            _, predicted = torch.max(out, 2)
+            _, predicted = torch.max(out, 1)
             ans = [CHARS[i] for i in predicted.tolist()]
             return ans
 
 
 if __name__ == '__main__':
-    man = Predictor('models/model')
-    path = input('Enter image path, empty to exist.')
+    man = Predictor('pretrained')
+    path = input('Enter image path, empty to exist: ')
     while path != '':
         print(man.identify(path))
-        path = input('Enter image path, empty to exist.')
+        path = input('Enter image path, empty to exist: ')

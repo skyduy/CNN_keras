@@ -63,5 +63,7 @@ target/
 .idea/
 .vscode/
 
-data/
-models/
+data/*
+models/*
+!.gitkeep
+!models/pretrained

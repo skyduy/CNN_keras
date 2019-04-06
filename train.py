@@ -49,21 +49,9 @@ class Net(nn.Module):
         torch.save(self.state_dict(), path)
 
     def load(self, name, folder='./models'):
-        # model (gpu, cpu); net (gpu, cpu)
         path = os.path.join(folder, name)
-        if self.device == 'cpu':
-            try:  # load cpu model directly
-                static_dict = torch.load(path)
-            except KeyError:  # load gpu model on cpu device
-                static_dict = torch.load(
-                    path, map_location=lambda storage, loc: storage)
-        else:
-            try:
-                static_dict = torch.load(path)
-            except Exception as e:  # load gpu model on cpu device
-                print('You are using GPU model, try CPU model')
-                raise e
-
+        map_location = 'cpu' if self.device == 'cpu' else 'gpu'
+        static_dict = torch.load(path, map_location)
         self.load_state_dict(static_dict)
         self.eval()
 
@@ -134,7 +122,7 @@ def fit(epochs, model, loss_func, opt, train_dl, valid_dl, verbose=None):
         if single_rate > max_acc:
             patience = 0
             max_acc = single_rate
-            model.save('model')
+            model.save('pretrained')
 
         print('After epoch {}: \n'
               '\tLoss: {:.6f}\n'
