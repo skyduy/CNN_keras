@@ -47,4 +47,4 @@ Using 20k training set:
 ## Others
 
 - If you have any questions, feel free to post a issue.
-- for pretrained model, click here.
+
