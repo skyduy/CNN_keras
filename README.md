@@ -1,6 +1,6 @@
 # CNN_Keras
 
-__:star: Switch to branch [pytorch](https://github.com/skyduy/CNN_keras/tree/pytorch) to see big changes! It uses pytorch and more robust method.:star:__
+__:star: Switch to branch [pytorch](https://github.com/skyduy/CNN_keras/tree/pytorch) to see big changes! It uses PyTorch as framework and uses a more robust method!.:star:__
 
 ## Introduction
 [Convolutional Neural Network](https://en.wikipedia.org/wiki/Convolutional_neural_network) using [Keras](https://github.com/fchollet/keras/tree/master/keras) for [CAPTCHA](https://en.wikipedia.org/wiki/CAPTCHA) recognition.
