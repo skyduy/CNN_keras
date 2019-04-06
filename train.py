@@ -12,15 +12,15 @@ class Net(nn.Module):
     def __init__(self, gpu=False):
         super(Net, self).__init__()
         # size: 3 * 36 * 120
-        self.conv1 = nn.Conv2d(3, 6, 5)  # 6 * 32 * 116
-        self.pool1 = nn.MaxPool2d(2)  # 6 * 16 * 58
-        self.conv2 = nn.Conv2d(6, 16, 5)  # 16 * 12 * 54
-        self.pool2 = nn.MaxPool2d(2)  # 16 * 6 * 27
+        self.conv1 = nn.Conv2d(3, 18, 5)  # 18 * 32 * 116
+        self.pool1 = nn.MaxPool2d(2)  # 18 * 16 * 58
+        self.conv2 = nn.Conv2d(18, 48, 5)  # 48 * 12 * 54
+        self.pool2 = nn.MaxPool2d(2)  # 48 * 6 * 27
         # flatten here
-        self.drop1 = nn.Dropout(0.25)
-        self.fc1 = nn.Linear(16 * 6 * 27, 540)
-        self.drop2 = nn.Dropout(0.5)
-        self.fc2 = nn.Linear(540, 19 * 4)
+        self.drop1 = nn.Dropout(0.5)
+        self.fc1 = nn.Linear(48 * 6 * 27, 640)
+        self.drop2 = nn.Dropout(0.25)
+        self.fc2 = nn.Linear(640, 19 * 4)
 
         if gpu:
             self.to(DEVICE)
@@ -34,7 +34,7 @@ class Net(nn.Module):
         x = self.pool1(x)
         x = F.relu(self.conv2(x))
         x = self.pool2(x)
-        x = x.view(-1, 16 * 6 * 27)  # flatten here
+        x = x.view(-1, 48 * 6 * 27)  # flatten here
         x = self.drop1(x)
         x = F.relu(self.fc1(x))
         x = self.drop2(x)
@@ -124,7 +124,7 @@ def fit(epochs, model, loss_func, opt, train_dl, valid_dl, verbose=None):
               '\tWhole Acc: {:.2f}%'
               .format(epoch + 1, val_loss, single_rate, whole_rate))
         if patience > patience_limit:
-            print('Early stop at epoch {}'.format(epoch+1))
+            print('Early stop at epoch {}'.format(epoch + 1))
             break
 
 
@@ -141,5 +141,4 @@ def train(use_gpu=True):
 
 
 if __name__ == '__main__':
-    # TODO： 错误字符统计
     train(True)
