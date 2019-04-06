@@ -18,8 +18,8 @@ as training data. So, for different CAPTCHA, we have to find a specific
 method to split it. The benefits is that while splitting the picture, 
 we also expand the training data samples and reduce the problem size.
 
-Method used in this branch is that we see the whole picture as a training sample, 
-and it has four labels, so it becomes a multilabel-classification problems.
+Method used in this branch is that we see the whole picture as one training sample 
+with four labels, so it becomes a multilabel-classification problems.
 See model graph below for detail info.
 
 
@@ -40,7 +40,9 @@ Using 20k training set:
 
 ## Model Graph 
 
-```Sorry for my ugly painting, and welcome to make pull requests to make it better :)```
+```Sorry for ugly painting, waiting for your pull requests to make it better :)```
+
+
 ![model](https://github.com/skyduy/CNN_keras/blob/pytorch/achievements/model.png)
 
 
