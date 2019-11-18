@@ -16,8 +16,3 @@ Actually these CAPTCHAs are generated from repo [CAPTCHA_generator](https://gith
 ## Achievement
 
 Using about 5000 samples, Obtain 95% single letter accuracy.
-
-
-## Others
-
-If you have any question, feel free to post a issue or email me.
